@@ -107,6 +107,48 @@
             padding: 15px;
         }
 
+        .credentials-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            color: #333;
+        }
+
+        .credentials-section h2 {
+            margin-bottom: 12px;
+            color: #2b2b6e;
+        }
+
+        .credentials-section p {
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .credentials-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .credentials-section li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .credentials-section a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .credentials-section code {
+            background: #f0f4ff;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
         .news-source {
             font-size: 0.85em;
             color: #667eea;
@@ -194,6 +236,28 @@
         <div class="loader" id="loader">Loading news...</div>
 
         <div class="news-grid" id="newsContainer"></div>
+
+        <section class="credentials-section" id="credentialsSection">
+            <h2>Project & Credentials Details</h2>
+            <p>Share this page with your team to show the repository and API setup for the Live News Fetcher project.</p>
+            <ul>
+                <li><strong>GitHub Repository:</strong> <a href="https://github.com/PerlaSaiVarshithReddy/livenewssss" target="_blank" rel="noopener">github.com/PerlaSaiVarshithReddy/livenewssss</a></li>
+                <li><strong>News API Provider:</strong> <a href="https://newsapi.org" target="_blank" rel="noopener">newsapi.org</a></li>
+                <li><strong>API Endpoint:</strong> <code>https://newsapi.org/v2/everything</code></li>
+                <li><strong>API Key:</strong> <code>296e932c05294076b012b645bd70de34</code></li>
+                <li><strong>How to use:</strong> Replace the value in the <code>API_KEY</code> constant inside <code>index.html</code> with your own NewsAPI key.</li>
+                <li><strong>DNS records required for custom domain:</strong>
+                    <ul>
+                        <li><code>A @ 185.199.108.153</code></li>
+                        <li><code>A @ 185.199.109.153</code></li>
+                        <li><code>A @ 185.199.110.153</code></li>
+                        <li><code>A @ 185.199.111.153</code></li>
+                    </ul>
+                </li>
+                <li><strong>Optional www alias:</strong> <code>CNAME www PerlaSaiVarshithReddy.github.io</code></li>
+                <li><strong>Security note:</strong> Keep private keys secure and avoid publishing sensitive credentials on public sites.</li>
+            </ul>
+        </section>
     </div>
 
     <script>
