@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live News Fetcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .loader {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            display: none;
+        }
+
+        .loader.active {
+            display: block;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+        }
+
+        .news-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .news-content {
+            padding: 15px;
+        }
+
+        .news-source {
+            font-size: 0.85em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .news-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .news-description {
+            font-size: 0.95em;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .news-date {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .read-more {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: 0.3s;
+        }
+
+        .read-more:hover {
+            background: #764ba2;
+        }
+
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .search-section {
+                flex-direction: column;
+            }
+
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📰 Live News</h1>
+            <p>Stay updated with the latest news</p>
+        </header>
+
+        <div class="search-section">
+            <input type="text" id="searchInput" placeholder="Search news...">
+            <button onclick="fetchNews()">Search</button>
+        </div>
+
+        <div class="error" id="error"></div>
+        <div class="loader" id="loader">Loading news...</div>
+
+        <div class="news-grid" id="newsContainer"></div>
+    </div>
+
+    <script>
+        const API_KEY = '296e932c05294076b012b645bd70de34'; // Get free key from https://newsapi.org
+        const API_URL = 'https://newsapi.org/v2/everything?q=';
+
+        async function fetchNews() {
+            const searchQuery = document.getElementById('searchInput').value || 'trending';
+            const loader = document.getElementById('loader');
+            const error = document.getElementById('error');
+            const newsContainer = document.getElementById('newsContainer');
+
+            loader.classList.add('active');
+            error.classList.remove('active');
+            newsContainer.innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_URL}${searchQuery}&sortBy=publishedAt&language=en&apiKey=${API_KEY}`);
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Invalid API key. Get free key from https://newsapi.org');
+                    }
+                    throw new Error(`Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.articles.length === 0) {
+                    error.textContent = 'No articles found. Try different keywords.';
+                    error.classList.add('active');
+                    loader.classList.remove('active');
+                    return;
+                }
+
+                displayNews(data.articles);
+            } catch (err) {
+                error.textContent = err.message;
+                error.classList.add('active');
+            } finally {
+                loader.classList.remove('active');
+            }
+        }
+
+        function displayNews(articles) {
+            const newsContainer = document.getElementById('newsContainer');
+            newsContainer.innerHTML = articles.map(article => `
+                <div class="news-card" onclick="window.open('${article.url}', '_blank')">
+                    <img src="${article.urlToImage || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${article.title}" class="news-image">
+                    <div class="news-content">
+                        <div class="news-source">${article.source.name}</div>
+                        <div class="news-title">${article.title}</div>
+                        <div class="news-description">${article.description || 'No description available'}</div>
+                        <div class="news-date">${new Date(article.publishedAt).toLocaleDateString()}</div>
+                        <a href="${article.url}" target="_blank" class="read-more">Read More →</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Fetch default news on page load
+        window.addEventListener('load', () => {
+            fetchNews();
+        });
+
+        // Allow Enter key to search
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                fetchNews();
+            }
+        });
+    </script>
+</body>
+</html>
